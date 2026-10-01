@@ -3,7 +3,7 @@ package com.store.authservice.dto;
 import lombok.Data;
 
 @Data
-public class UserRegistrationDTO {
+public class RegistrationRequest {
     private String username;
     private String password;
     private String email;

@@ -1,11 +1,13 @@
 package com.store.authservice.services;
 
-import com.store.authservice.dto.UserDTO;
-import com.store.authservice.dto.UserLoginDTO;
-import com.store.authservice.dto.UserRegistrationDTO;
+import com.store.authservice.dto.AuthorizedResponse;
+import com.store.authservice.dto.LoginRequest;
+import com.store.authservice.dto.RegistrationRequest;
 
 public interface AuthService {
-    void register(UserRegistrationDTO userRegistrationDTO);
+    AuthorizedResponse register(RegistrationRequest registrationRequest);
 
-    UserDTO login(UserLoginDTO userLoginDTO);
+    AuthorizedResponse login(LoginRequest loginRequest);
+
+    void logout(String token);
 }
