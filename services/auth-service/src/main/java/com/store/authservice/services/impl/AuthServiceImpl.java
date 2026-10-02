@@ -1,10 +1,12 @@
 package com.store.authservice.services.impl;
 
-import com.store.authservice.dto.AuthorizedResponse;
+import com.store.authservice.dto.responses.AuthorizedResponse;
 import com.store.authservice.dto.UserDTO;
-import com.store.authservice.dto.LoginRequest;
-import com.store.authservice.dto.RegistrationRequest;
+import com.store.authservice.dto.requests.LoginRequest;
+import com.store.authservice.dto.requests.RegistrationRequest;
 import com.store.authservice.entities.User;
+import com.store.authservice.exceptions.InvalidCredentialsException;
+import com.store.authservice.exceptions.UserAlreadyExistsException;
 import com.store.authservice.repos.UserRepo;
 import com.store.authservice.services.AuthService;
 import com.store.authservice.services.SessionService;
@@ -28,7 +30,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthorizedResponse register(RegistrationRequest registrationRequest) {
         if (userRepo.existsByEmail(registrationRequest.getEmail())) {
-            throw new RuntimeException("User with this email already exists");
+            throw new UserAlreadyExistsException();
         }
 
         User user = new User(
@@ -49,11 +51,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthorizedResponse login(LoginRequest loginRequest) {
         User user = userRepo.findByEmail(loginRequest.getEmail())
-                        .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                        .orElseThrow(InvalidCredentialsException::new);
 
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException();
         }
 
         UserDTO userDTO = toUserDTO(user);

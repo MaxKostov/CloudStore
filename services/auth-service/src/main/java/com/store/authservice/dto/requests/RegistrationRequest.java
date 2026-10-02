@@ -1,4 +1,4 @@
-package com.store.authservice.dto;
+package com.store.authservice.dto.requests;
 
 import lombok.Data;
 

@@ -2,6 +2,7 @@ package com.store.authservice.services.impl;
 
 import com.store.authservice.dto.SessionInfo;
 import com.store.authservice.dto.UserDTO;
+import com.store.authservice.exceptions.SessionDoesntExistException;
 import com.store.authservice.repos.RedisSessionRepo;
 import com.store.authservice.services.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public SessionInfo getSession(String token) {
-        return redisSessionRepo.getSession(token).orElseThrow(() -> new RuntimeException("Session not found"));
+        return redisSessionRepo.getSession(token).orElseThrow(SessionDoesntExistException::new);
     }
 
     @Override

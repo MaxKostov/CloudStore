@@ -1,8 +1,8 @@
 package com.store.authservice.controllers;
 
-import com.store.authservice.dto.AuthorizedResponse;
-import com.store.authservice.dto.LoginRequest;
-import com.store.authservice.dto.RegistrationRequest;
+import com.store.authservice.dto.responses.AuthorizedResponse;
+import com.store.authservice.dto.requests.LoginRequest;
+import com.store.authservice.dto.requests.RegistrationRequest;
 import com.store.authservice.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

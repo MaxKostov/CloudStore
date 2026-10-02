@@ -1,8 +1,8 @@
 package com.store.authservice.services;
 
-import com.store.authservice.dto.AuthorizedResponse;
-import com.store.authservice.dto.LoginRequest;
-import com.store.authservice.dto.RegistrationRequest;
+import com.store.authservice.dto.responses.AuthorizedResponse;
+import com.store.authservice.dto.requests.LoginRequest;
+import com.store.authservice.dto.requests.RegistrationRequest;
 
 public interface AuthService {
     AuthorizedResponse register(RegistrationRequest registrationRequest);
