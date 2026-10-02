@@ -4,6 +4,7 @@ import com.store.authservice.dto.responses.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -69,5 +70,32 @@ public class GlobalExceptionHandler {
         response.setTimestamp(Instant.now());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        String message = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error ->
+                        error.getField() + ": " + error.getDefaultMessage()
+                )
+                .findFirst()
+                .orElse("Invalid request");
+
+        ErrorResponse response = new ErrorResponse();
+
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        response.setMessage(message);
+        response.setPath(request.getRequestURI());
+        response.setTimestamp(Instant.now());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 }

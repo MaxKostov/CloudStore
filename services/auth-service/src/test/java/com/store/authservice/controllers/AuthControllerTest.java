@@ -6,6 +6,8 @@ import com.store.authservice.exceptions.InvalidCredentialsException;
 import com.store.authservice.exceptions.UserAlreadyExistsException;
 import com.store.authservice.services.AuthService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -13,8 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -64,15 +65,15 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                    {
-                                      "username": "maxim",
-                                      "email": "maxim@test.com",
-                                      "password": "password123"
-                                    }
-                                 """))
-                        .andExpect(status().isConflict())
-                        .andExpect(jsonPath("$.status").value(409))
-                        .andExpect(jsonPath("$.error").value("Conflict"));
+                        {
+                          "username": "maxim",
+                          "email": "maxim@test.com",
+                          "password": "Password1!"
+                        }
+                        """))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("Conflict"));
     }
 
     @Test
@@ -90,5 +91,49 @@ class AuthControllerTest {
                                  """))
                         .andExpect(status().isUnauthorized())
                         .andExpect(jsonPath("$.status").value(401));
+    }
+
+    @Test
+    void register_withInvalidPassword_shouldReturn400() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "username": "maxim",
+                          "email": "maxim@test.com",
+                          "password": "Pass!"
+                        }
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").exists());
+
+        verify(authService, never()).register(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Pass!",
+            "password!",
+            "Password123",
+            "Password123456789!"
+    })
+    void register_withInvalidPassword_shouldReturn400(
+            String password
+    ) throws Exception {
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "username": "maxim",
+                          "email": "maxim@test.com",
+                          "password": "%s"
+                        }
+                        """.formatted(password)))
+                .andExpect(status().isBadRequest());
+
+        verify(authService, never()).register(any());
     }
 }

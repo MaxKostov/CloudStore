@@ -4,6 +4,7 @@ import com.store.authservice.dto.responses.AuthorizedResponse;
 import com.store.authservice.dto.requests.LoginRequest;
 import com.store.authservice.dto.requests.RegistrationRequest;
 import com.store.authservice.services.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,13 +22,15 @@ public class AuthController {
     }
 
     @PostMapping("/api/auth/register")
-    public ResponseEntity<AuthorizedResponse> registerUser(@RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<AuthorizedResponse> registerUser(
+            @Valid @RequestBody RegistrationRequest registrationRequest
+    ) {
         AuthorizedResponse response = authService.register(registrationRequest);
         return ResponseEntity.ok().body(response);
     }
 
     @PostMapping("/api/auth/login")
-    public ResponseEntity<AuthorizedResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<AuthorizedResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         AuthorizedResponse response = authService.login(loginRequest);
         return  ResponseEntity.ok().body(response);
     }
